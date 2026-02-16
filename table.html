@@ -43,7 +43,7 @@
             padding: 12px;
             text-align: left;
             font-size: 14px;
-            letter-spacing: 0.5px;
+            cursor: pointer;
         }
 
         tbody td {
@@ -218,20 +218,22 @@
         });
 
         var table_headers = document.querySelectorAll('th');
-        console.log(table_headers)
+
         table_headers.forEach((th) => {
             if (th.dataset.sort) {
-                console.log(th.dataset.sort)
-                th.addEventListener('onclick', sort_headers(th.dataset.sort))
+                th.addEventListener('click', () => {
+                    sort_headers(th.dataset.sort);
+                });
             }
-        })
+        });
 
+        // sort function
         function sort_headers(header) {
             book_info = data.sort((a, b) => {
-                return a[header] - b[header]
-            })
-            current_page = 1
-            genTable()
+                return a[header].toLowerCase().localeCompare(b[header].toLowerCase());
+            });
+            current_page = 1;
+            genTable();
         }
     </script>
 
