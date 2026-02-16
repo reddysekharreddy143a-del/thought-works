@@ -127,17 +127,17 @@
         <thead>
             <tr>
                 <th data-sort="title">Title</th>
-                <th data-sort="ISBN">ISBN</th>
-                <th data-sort="Page_Count">Page Count</th>
-                <th data-sort="Published_Date">Published Date</th>
+                <th data-sort="isbn">ISBN</th>
+                <th data-sort="pageCount">Page Count</th>
+                <th>Published Date</th>
                 <th>Image</th>
-                <th data-sort="Short_Description">Short Description</th>
-                <th data-sort="Long_Description">Long Description</th>
-                <th data-sort="Status">Status</th>
+                <th data-sort="shortDescription">Short Description</th>
+                <th data-sort="longDescription">Long Description</th>
+                <th data-sort="status">Status</th>
                 <th>Authors</th>
                 <th>Categories</th>
-                <th data-sort="Price">Price ($)</th>
-                <th data-sort="Discount">Discount (%)</th>
+                <th data-sort="price">Price ($)</th>
+                <th data-sort="discount">Discount (%)</th>
             </tr>
         </thead>
         <tbody id="books-table"></tbody>
@@ -169,7 +169,10 @@
                 <td>${book.pageCount || 'no-data'}</td>
                 <td>${book.publishedDate ? book.publishedDate.$date.split('T')[0] : 'no-data'}</td>
                 <td><img src="${book.thumbnailUrl || ''}"/></td>
-                <td>${book.shortDescription || 'no-data'}</td>
+                <td> ${book.shortDescription
+                        ? book.shortDescription.substring(0, 120) + '...'
+                        : 'no-data'}
+                </td>
                 <td class="longDescription">
                     ${book.longDescription
                         ? book.longDescription.substring(0, 120) + '...'
@@ -217,6 +220,7 @@
             genTable();
         });
 
+
         var table_headers = document.querySelectorAll('th');
 
         table_headers.forEach((th) => {
@@ -230,7 +234,10 @@
         // sort function
         function sort_headers(header) {
             book_info = data.sort((a, b) => {
-                return a[header].toLowerCase().localeCompare(b[header].toLowerCase());
+                if (["pageCount", "price", "discount"].includes(header)) {
+                    return (a[header] ?? 0) - (b[header] ?? 0);
+                }
+                return a[header]?.toLowerCase().localeCompare(b[header]?.toLowerCase());
             });
             current_page = 1;
             genTable();
