@@ -116,9 +116,12 @@
         }
 
         th i {
-            color: white;
-            font-size: 12px;
-            opacity: 0.7;
+            display: none;
+            margin-left: 5px;
+        }
+
+        th i.active {
+            display: inline;
         }
     </style>
 </head>
@@ -134,18 +137,34 @@
     <table id="books-data">
         <thead>
             <tr>
-                <th data-sort="title">Title <i class="bi bi-funnel"></i></th>
-                <th data-sort="isbn">ISBN <i class="bi bi-funnel"></i></th>
-                <th data-sort="pageCount">Page Count <i class="bi bi-funnel"></i></th>
+                <th data-sort="title" data-direction="ac">
+                    Title<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
+                <th data-sort="isbn" data-direction="ac">
+                    ISBN<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
+                <th data-sort="pageCount" data-direction="ac">
+                    Page Count<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
                 <th>Published Date</th>
                 <th>Image</th>
-                <th data-sort="shortDescription">Short Description <i class="bi bi-funnel"></i></th>
-                <th data-sort="longDescription">Long Description <i class="bi bi-funnel"></i></th>
-                <th data-sort="status">Status <i class="bi bi-funnel"></i></th>
+                <th data-sort="shortDescription" data-direction="ac">
+                    Short Description<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
+                <th data-sort="longDescription" data-direction="ac">
+                    Long Description<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
+                <th data-sort="status" data-direction="ac">
+                    Status<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
                 <th>Authors</th>
                 <th>Categories</th>
-                <th data-sort="price">Price ($) <i class="bi bi-funnel"></i></th>
-                <th data-sort="discount">Discount (%) <i class="bi bi-funnel"></i></th>
+                <th data-sort="price" data-direction="ac">
+                    Price ($)<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
+                <th data-sort="discount" data-direction="ac">
+                    Discount (%)<i class="bi bi-arrow-up active"></i><i class="bi bi-arrow-down"></i>
+                </th>
             </tr>
         </thead>
         <tbody id="books-table"></tbody>
@@ -229,24 +248,40 @@
         });
 
 
-        var table_headers = document.querySelectorAll('th');
-
-        table_headers.forEach((th) => {
-            if (th.dataset.sort) {
-                th.addEventListener('click', () => {
-                    sort_headers(th.dataset.sort);
-                });
-            }
+        document.querySelectorAll("th[data-sort]").forEach(th => {
+            th.addEventListener("click", () => {
+                sort_headers(th.dataset.sort, th)
+            });
         });
 
         // sort function
-        function sort_headers(header) {
-            book_info = data.sort((a, b) => {
-                if (["pageCount", "price", "discount"].includes(header)) {
-                    return (a[header] ?? 0) - (b[header] ?? 0);
-                }
-                return a[header]?.toLowerCase().localeCompare(b[header]?.toLowerCase());
-            });
+        function sort_headers(header, th) {
+
+            let upArrow = th.querySelector(".bi-arrow-up")
+            let downArrow = th.querySelector(".bi-arrow-down")
+
+            if (th.dataset.direction === "ac") {
+                th.dataset.direction = 'dc'
+                downArrow.classList.add("active")
+                upArrow.classList.remove('active')
+                book_info = [...data].sort((a, b) => {
+                    if (["pageCount", "price", "discount"].includes(header)) {
+                        return (a[header] ?? 0) - (b[header] ?? 0);
+                    }
+                    return a[header]?.toLowerCase().localeCompare(b[header]?.toLowerCase());
+                });
+            }
+            else {
+                th.dataset.direction = 'ac'
+                upArrow.classList.add("active");
+                downArrow.classList.remove('active')
+                book_info = book_info.sort((a, b) => {
+                    if (["pageCount", "price", "discount"].includes(header)) {
+                        return (b[header] ?? 0) - (a[header] ?? 0);
+                    }
+                    return b[header]?.toLowerCase().localeCompare(a[header]?.toLowerCase());
+                });
+            }
             current_page = 1;
             genTable();
         }
